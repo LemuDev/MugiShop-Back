@@ -1,12 +1,14 @@
 from src import app
-import os
+from decouple import config
+
+app.config["SECRET_KEY"] = config("SECRET_KEY")
 
 
-app.config["SECRET_KEY"] = os.environ["SECRET_KEY"]
+
 
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8000)    
+    app.run(debug=config("DEBUG"), port=8000)    
 
 
