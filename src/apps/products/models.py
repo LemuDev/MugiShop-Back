@@ -11,5 +11,5 @@ class Products(db.Model):
     price = db.Column(db.Integer())
     image = db.Column(db.String(255))
     
-    is_shell = db.Column(db.Boolean(), default=False)
+    is_sell = db.Column(db.Boolean(), default=False)
     created_at = db.Column(db.Date(), default=date.today() )
