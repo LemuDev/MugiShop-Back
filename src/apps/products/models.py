@@ -13,3 +13,4 @@ class Products(db.Model):
     
     is_sell = db.Column(db.Boolean(), default=False)
     created_at = db.Column(db.Date(), default=date.today() )
+    
