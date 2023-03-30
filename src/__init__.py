@@ -2,7 +2,7 @@ from flask import Flask
 from src.config.db import db
 from src.config.ma import ma
 from decouple import config
-from src.apps.products.router import bp as produts_router
+from src.apps.Shop.router import bp as produts_router
 from os import getcwd
 
 

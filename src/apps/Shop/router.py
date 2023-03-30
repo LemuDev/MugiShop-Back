@@ -68,10 +68,16 @@ def products_list():
 
 
 
-@bp.route("/seed-products", methods=["GET"])
+@bp.route("/seed-shop", methods=["GET"])
 def seed_products():
+    for c in categories_seed:
+        categories = Categories()
+        categories.name = c
+
+        db.session.add(categories)
+        db.session.commit()
     
-        
+
     for p in products_seed:
         products = Products()
         
@@ -87,22 +93,9 @@ def seed_products():
         
         
     
-    return jsonify({"seed": products_seed})
+    return jsonify({"message": "Seed Success"})
 
 
-@bp.route("/seed-categories", methods=["GET"])
-def seed_categories():
-    
-    for c in categories_seed:
-        categories = Categories()
-        categories.name = c
-
-        db.session.add(categories)
-        db.session.commit()
-    
-        
-    
-    return jsonify({})
 
 @bp.route("/categories", methods=["GET"])
 def categories_list():
