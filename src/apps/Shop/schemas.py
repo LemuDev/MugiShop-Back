@@ -1,5 +1,5 @@
 from src.config.ma import ma
-from src.apps.products.models import Products
+from src.apps.Shop.models import Products
 
 
 class ProductsSchemas(ma.Schema):
