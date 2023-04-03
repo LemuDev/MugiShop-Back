@@ -11,8 +11,10 @@
 ## Crear Tablas de los modelos
 + python
 + from src import app
-+ from src.apps.products.models import Categories, Products
++ from src.apps.Shop.models import *
++ from src.apps.Auth.models import *
 + from src.config.db import db
++ with app.app_context(): db.drop_all()
 + with app.app_context(): db.create_all()
 
 
