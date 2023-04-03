@@ -1,9 +1,17 @@
 from flask import Blueprint, jsonify
 from flask import request
 
+import datetime
+from flask_jwt_extended import create_access_token
+
+
 from .models import Users
 from .schemas import UserValidator
 from src.config.db import db
+
+
+
+
 
 
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -76,4 +84,23 @@ def register():
                 "message": "Usuario Creado Correctamente"
             })
     
+@bp.route("/login", methods=["POST"])
+def login():
+    email = request.json.get("email")
+    password = request.json.get("password")
     
+    user_by_email = Users.query.filter_by(email=email).first()
+
+    if user_by_email == None:
+        
+        return jsonify(error= "Email o contraseña incorrectos")
+    
+    else:
+        if check_password_hash(password=password, pwhash=user_by_email.password):
+            
+            access_token = create_access_token(identity=email, expires_delta=datetime.timedelta(days=20))
+            return jsonify(access_token=access_token)
+        
+        else:
+   
+            return jsonify(error="Email o contraseña incorrectos")
