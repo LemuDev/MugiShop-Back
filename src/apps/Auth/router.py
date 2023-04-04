@@ -1,0 +1,79 @@
+from flask import Blueprint, jsonify
+from flask import request
+
+from .models import Users
+from .schemas import UserValidator
+from src.config.db import db
+
+
+from werkzeug.security import generate_password_hash, check_password_hash
+
+
+bp = Blueprint('auth', __name__, url_prefix="/api")
+
+
+@bp.route("/register", methods=["POST"])
+def register():
+    first_name = request.json.get("first_name")
+    last_name = request.json.get("last_name")
+    email = request.json.get("email")
+    password = request.json.get("password")
+    
+    
+    if first_name == None or last_name == None or email == None or password == None:
+    
+        return jsonify({
+            "Error": "No se pasan los datos necesarios para crear un usuario"
+        })
+        
+    else:
+        first_name = first_name.strip()
+        last_name = last_name.strip()
+        email = email.strip()
+        password = password.strip()
+        
+
+        
+        new_user_data = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "email": email,
+            "password": password
+        }
+
+        errors = UserValidator().validate(data=new_user_data)
+
+   
+        if len(errors) >= 1:
+    
+            return jsonify(errors= errors)
+        
+        else:
+            user_by_email_count = Users.query.filter_by(email=email).count()
+            
+            if user_by_email_count >= 1:
+                return jsonify({
+                    "errors": {
+                        "email": ["Este email ya esta registrado"]
+                    }
+                })
+    
+
+            password_hash = generate_password_hash(password)
+            print(password_hash)
+            
+            create_user = Users()
+            create_user.first_name = first_name
+            create_user.last_name = last_name
+            create_user.email = email
+            create_user.password = password_hash
+            create_user.is_admin = False
+            
+            db.session.add(create_user)
+            db.session.commit()
+                
+            return jsonify({
+                "message": "Usuario Creado Correctamente"
+            })
+    
+    

@@ -31,13 +31,11 @@ def products_list():
             products_by_name = Products.query.filter(Products.name.ilike("%" + name + "%")).filter_by(categories=category).all()
             products_by_name_count = Products.query.filter(Products.name.ilike("%" + name + "%")).filter_by(categories=category).count()
         
-        if products_by_name_count  <= 0:
-            return jsonify({"message": "No existe un producto con estas carateristicas"})
-            
-            
-        for p in products_by_name:
-            p.categories = p.categories_rel.name
-            
+        if products_by_name_count  >= 1:
+      
+            for p in products_by_name:
+                p.categories = p.categories_rel.name
+                
         return jsonify( products_schema.dump(products_by_name) )
     else:
         if category is not None:
@@ -45,12 +43,10 @@ def products_list():
             products_by_name_count = Products.query.filter_by(categories=category).count()
         
         
-            if products_by_name_count  <= 0:
-                return jsonify({"message": "No existe un producto con estas carateristicas"})
-            
-        
-            for p in products_by_name:
-                p.categories = p.categories_rel.name        
+            if products_by_name_count  >= 1:
+
+                for p in products_by_name:
+                    p.categories = p.categories_rel.name        
             
             return jsonify( products_schema.dump(products_by_name) )        
     
