@@ -68,8 +68,7 @@ def register():
     
 
             password_hash = generate_password_hash(password)
-            print(password_hash)
-            
+   
             create_user = Users()
             create_user.first_name = first_name
             create_user.last_name = last_name
