@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 
 from src.config.db import db
 from src.config.ma import ma
@@ -17,6 +18,11 @@ app.config["SQLALCHEMY_DATABASE_URI"] = config('SQLALCHEMY_DATABASE_URI')
 app.config["SECRET_KEY"] = config("SECRET_KEY")
 app.config["JWT_SECRET_KEY"] = config('JWT_SECRET_KEY')
 
+
+cors = CORS(
+    app, 
+    origins=['http://localhost:5173', 'http://127.0.0.1:5173']
+)
 
 
 app.register_blueprint(shop_router)

@@ -2,7 +2,7 @@
 
 ## Crear y activar Entorno virtual
 + virtualenv env
-+ cd env/script
++ cd env/scripts
 + activate
 
 ## Instalar dependencias 
