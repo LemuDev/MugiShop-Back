@@ -86,12 +86,17 @@ def register():
             return jsonify(access_token=access_token)
 
 
-    
-
 @bp.route("/login", methods=["POST"])
 def login():
-    email = request.json.get("email")
-    password = request.json.get("password")
+    data = request.json
+
+
+    email = data.get("email")
+    password = data.get("password")
+    
+    if email == None or password == None:
+        return jsonify(error="No se pasan los datos necesarios")
+    
     
     user_by_email = Users.query.filter_by(email=email).first()
 
@@ -99,12 +104,12 @@ def login():
         
         return jsonify(error= "Email o contraseña incorrectos")
     
-    else:
-        if check_password_hash(password=password, pwhash=user_by_email.password):
-            
-            access_token = create_access_token(identity=email, expires_delta=datetime.timedelta(days=20))
-            return jsonify(access_token=access_token)
+
+    if check_password_hash(password=password, pwhash=user_by_email.password):
         
-        else:
+        access_token = create_access_token(identity=email, expires_delta=datetime.timedelta(days=20))
+        return jsonify(access_token=access_token)
+    
+
    
-            return jsonify(error="Email o contraseña incorrectos")
+    return jsonify(error="Email o contraseña incorrectos")
