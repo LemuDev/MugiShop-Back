@@ -450,13 +450,6 @@ products = [
         "category": 6
     },
     {
-        "name": "Portal 2077",
-        "price": 10.99,
-        "image": "/Fantasy/00056.png",
-        "is_sell": False,
-        "category": 6
-    },
-    {
         "name": "Inicio del terror",
         "price": 10.99,
         "image": "/Fantasy/00099.png",

@@ -55,9 +55,10 @@ def products_list():
 
     # when there are not args
     
-    products = Products.query.all()
+    products = Products.query.filter().all()
     
     for p in products:
+        
         p.categories = p.categories_rel.name
     
     return jsonify( products_schema.dump(products) )
