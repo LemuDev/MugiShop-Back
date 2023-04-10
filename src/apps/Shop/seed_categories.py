@@ -6,7 +6,7 @@ categories = [
     "Creatures",
     "Fantasy",
     "Futuristic",
+    "Landscapes",
     "Portraits",
-    "Space",
-    "Vintage"
+    "Space"
 ]
