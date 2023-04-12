@@ -20,13 +20,24 @@ class Products(db.Model):
     
     categories = db.Column(db.Integer, db.ForeignKey("categories.id"))
     
-    cart = db.relationship('Cart', backref='Products')
+    cart = db.relationship('CartItems', backref='products')
 
-    
+
+
+
 class Cart(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
-    
-    product_id = db.Column(db.Integer(), db.ForeignKey('products.id'))
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    cart_items = db.relationship('CartItems', backref='cart')
     
+
+class CartItems(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)    
+    product_id = db.Column(db.Integer(), db.ForeignKey('products.id'))
+    cart_items = db.Column(db.Integer(), db.ForeignKey('cart.id'))
+    
+        
+
+
+        
     
