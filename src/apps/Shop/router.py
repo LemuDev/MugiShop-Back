@@ -2,12 +2,13 @@ from flask import Blueprint, jsonify, request
 from .seed_products import products as products_seed
 from .seed_categories import categories as categories_seed
 
-from .models import Products, Categories
+from .models import Products, Categories, CartItems, Cart
+from src.apps.Auth.models import Users
 from src.config.db import db
 from .schemas import ProductsSchemas, CategoriesSchemas
 
 
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
 bp = Blueprint("products", __name__, url_prefix="/api")
@@ -103,18 +104,51 @@ def categories_list():
 
 
 
-@bp.route("/cart", methods=["GET"])
-def CartData():
-    return {}
-
 
 @bp.route("/cart", methods=["POST"])
-def CreateCart():
-    return {}
+@jwt_required()
+def add_to_cart():
+    current_user = get_jwt_identity()
+    
+    if not request.is_json:
+        
+        return jsonify({
+            "error": "El formato de envio de datos no es correcto"
+        }), 400
+            
+    else:
+        data = request.json
+
+        user_by_email = Users.query.filter_by(email = current_user).first()
+
+        product_id = data.get("product")        
+        
+        try:
+            product_id = int(product_id)       
+        except:
+            
+            return jsonify(error="El tipo de dato del prodcto debe de ser numerico"), 400 
+        
+
+        product_by_id = Products.query.filter_by(id=product_id).one_or_none()
+        
+        if product_by_id == None:
+            
+            return jsonify(error="El producto que se intenta agregar no existe"), 404
 
 
-@bp.route("/cart", methods=["DELETE"])
-def CartDeleteCartItem():
-    return {}
-
-
+        cart_by_user = Cart.query.filter_by(user_id=user_by_email.id).one_or_none()
+        is_item_in_cart = CartItems.query.filter_by(cart_id=cart_by_user.id).filter_by(product_id=product_by_id.id).count()
+        
+        if is_item_in_cart >= 1:
+            
+            return jsonify(error="El producto que se intenta agregar ya esta en el carrito"), 400
+        
+        item_in_cart = CartItems()
+        item_in_cart.product_id = product_id
+        item_in_cart.cart_id = cart_by_user.id  
+        
+        db.session.add(item_in_cart)
+        db.session.commit()          
+    
+        return jsonify(message=f"{product_by_id.name} fue Agregado al carrito") 

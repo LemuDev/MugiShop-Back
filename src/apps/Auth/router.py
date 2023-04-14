@@ -4,6 +4,8 @@ from flask import request
 import datetime
 from flask_jwt_extended import create_access_token
 from .models import Users
+from src.apps.Shop.models import Cart
+
 from .schemas import UserValidator
 from src.config.db import db
 
@@ -33,7 +35,7 @@ def register():
     if first_name == None or last_name == None or email == None or password == None:
         return jsonify({
             "Error": "No se pasan los datos necesarios para crear un usuario"
-        })
+        }), 400
     
     
     new_user_data = {
@@ -48,7 +50,7 @@ def register():
 
     if len(errors) >= 1:
 
-        return jsonify(errors= errors)
+        return jsonify(errors= errors), 400
     
 
     user_by_email_count = Users.query.filter_by(email=email).count()
@@ -58,7 +60,7 @@ def register():
             "errors": {
                 "email": ["Este email ya esta registrado"]
             }
-        })
+        }), 400
 
 
     password_hash = generate_password_hash(password)
@@ -72,8 +74,17 @@ def register():
     
     db.session.add(create_user)
     db.session.commit()
+  
+    # Crear Carrito 
+    user_id = Users.query.filter_by(email = email).first()
+  
+    create_cart = Cart()
+    create_cart.user_id = user_id.id  
+    db.session.add(create_cart)
+    db.session.commit()
+         
+         
     
-                
     access_token = create_access_token(identity=email, expires_delta=datetime.timedelta(days=20))
     return jsonify(access_token=access_token)
 
@@ -94,7 +105,7 @@ def login():
 
     if user_by_email == None:
         
-        return jsonify(error= "Email o contraseña incorrectos")
+        return jsonify(error= "Email o contraseña incorrectos"), 400
     
 
     if check_password_hash(password=password, pwhash=user_by_email.password):
@@ -104,7 +115,7 @@ def login():
     
 
    
-    return jsonify(error="Email o contraseña incorrectos")
+    return jsonify(error="Email o contraseña incorrectos"), 400
 
 
 
