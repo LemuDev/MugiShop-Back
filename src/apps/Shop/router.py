@@ -5,7 +5,7 @@ from .seed_categories import categories as categories_seed
 from .models import Products, Categories, CartItems, Cart
 from src.apps.Auth.models import Users
 from src.config.db import db
-from .schemas import ProductsSchemas, CategoriesSchemas
+from .schemas import ProductsSchemas, CategoriesSchemas, CartItemSchemas
 
 
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -152,3 +152,37 @@ def add_to_cart():
         db.session.commit()          
     
         return jsonify(message=f"{product_by_id.name} fue Agregado al carrito") 
+
+@bp.route("/cart", methods=["GET"])
+@jwt_required()
+def cart_list():
+    current_user = get_jwt_identity()
+    user_by_email = Users.query.filter_by(email = current_user).one_or_none()
+    
+    cart_by_user = Cart.query.filter_by(user_id = user_by_email.id).one_or_none()
+    
+    
+
+    
+    cart_items = CartItems.query.filter_by(cart_id=cart_by_user.id).all()
+    
+    cart = []
+    for c_i in cart_items:
+        
+        product = Products.query.filter_by(id=c_i.id).first()
+     
+        cart.append({
+            "id":c_i.id,
+            "product": product.name,
+            "product_img": product.image
+        })
+        
+        
+        print("product_img", c_i.cart.user_id)
+    
+    
+    
+    cart_serializer = CartItemSchemas(many=True)
+    
+    
+    return jsonify(cart_serializer.dump(cart))
