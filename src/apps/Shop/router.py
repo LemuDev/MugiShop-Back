@@ -169,7 +169,7 @@ def cart_list():
     cart = []
     for c_i in cart_items:
         
-        product = Products.query.filter_by(id=c_i.id).first()
+        product = Products.query.filter_by(id=c_i.product_id).first()
      
         cart.append({
             "id":c_i.id,
