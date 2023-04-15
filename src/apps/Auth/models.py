@@ -11,3 +11,5 @@ class Users(db.Model):
     password = db.Column(db.String(255), nullable=False)
     
     is_admin = db.Column(db.Boolean, default=False, nullable=False)
+    
+    cart = db.relationship('Cart', backref='Users')

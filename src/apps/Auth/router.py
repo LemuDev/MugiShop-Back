@@ -3,16 +3,9 @@ from flask import request
 
 import datetime
 from flask_jwt_extended import create_access_token
-
-
 from .models import Users
 from .schemas import UserValidator
 from src.config.db import db
-
-
-
-
-
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -26,8 +19,8 @@ def register():
     if not request.is_json:
         
         return jsonify({
-            "Error": "No se pasan los datos necesarios para crear un usuario"
-        })
+            "Error": "Los datos Deben de ser un Json. Datos No procesables"
+        }, 400)
     
     
     data = request.json
@@ -80,10 +73,9 @@ def register():
     db.session.add(create_user)
     db.session.commit()
     
-    if check_password_hash(password=password, pwhash=password):
-            
-            access_token = create_access_token(identity=email, expires_delta=datetime.timedelta(days=20))
-            return jsonify(access_token=access_token)
+                
+    access_token = create_access_token(identity=email, expires_delta=datetime.timedelta(days=20))
+    return jsonify(access_token=access_token)
 
 
 @bp.route("/login", methods=["POST"])
@@ -113,3 +105,9 @@ def login():
 
    
     return jsonify(error="Email o contraseña incorrectos")
+
+
+
+
+
+

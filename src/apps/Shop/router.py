@@ -7,6 +7,9 @@ from src.config.db import db
 from .schemas import ProductsSchemas, CategoriesSchemas
 
 
+from flask_jwt_extended import jwt_required
+
+
 bp = Blueprint("products", __name__, url_prefix="/api")
 
 product_schema = ProductsSchemas()
@@ -63,8 +66,6 @@ def products_list():
     
     return jsonify( products_schema.dump(products) )
 
-
-
 @bp.route("/seed-shop", methods=["GET"])
 def seed_products():
     for c in categories_seed:
@@ -92,8 +93,6 @@ def seed_products():
     
     return jsonify({"message": "Seed Success"})
 
-
-
 @bp.route("/categories", methods=["GET"])
 def categories_list():
     categories = Categories.query.all()
@@ -101,5 +100,21 @@ def categories_list():
 
     
     return jsonify(categories_schema.dump(categories))
+
+
+
+@bp.route("/cart", methods=["GET"])
+def CartData():
+    return {}
+
+
+@bp.route("/cart", methods=["POST"])
+def CreateCart():
+    return {}
+
+
+@bp.route("/cart", methods=["DELETE"])
+def CartDeleteCartItem():
+    return {}
 
 
