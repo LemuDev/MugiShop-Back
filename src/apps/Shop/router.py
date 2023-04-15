@@ -136,8 +136,10 @@ def add_to_cart():
             
             return jsonify(error="El producto que se intenta agregar no existe"), 404
 
-        if product_by_id.is_sell:
+        if product_by_id.is_sell == True:
+            
             return jsonify(error="El producto que se intenta agregar ya fue vendido, las imagenes solo se venden una vez"), 400
+
 
 
         cart_by_user = Cart.query.filter_by(user_id=user_by_email.id).one_or_none()
