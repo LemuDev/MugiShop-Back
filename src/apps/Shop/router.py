@@ -135,9 +135,8 @@ def add_to_cart():
             return jsonify(error="El producto que se intenta agregar no existe"), 404
 
         if product_by_id.is_sell == True:
-           
-            return jsonify(error="El producto que se intenta agregar ya fue vendido, las imagenes solo se venden una vez"), 400
 
+            return jsonify(error="El producto que se intenta agregar ya fue vendido, las imagenes solo se venden una vez"), 400
 
         cart_by_user = Cart.query.filter_by(user_id=user_by_email.id).one_or_none()
         is_item_in_cart = CartItems.query.filter_by(cart_id=cart_by_user.id).filter_by(product_id=product_by_id.id).count()
@@ -162,7 +161,6 @@ def cart_list():
     user_by_email = Users.query.filter_by(email = current_user).one_or_none()
     
     cart_by_user = Cart.query.filter_by(user_id = user_by_email.id).one_or_none()
-    
     cart_items = CartItems.query.filter_by(cart_id=cart_by_user.id).all()
     
     cart = []
@@ -185,7 +183,6 @@ def cart_list():
     
     
     return jsonify(cart_serializer.dump(cart))
-
 
 
 
@@ -235,3 +232,4 @@ def delete_item_cart():
 
         
             
+

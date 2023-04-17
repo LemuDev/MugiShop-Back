@@ -15,6 +15,7 @@ class CategoriesSchemas(ma.Schema):
         fields = ('id', 'name')
         
 class CartItemSchemas(ma.Schema):
+
     class Meta:
         fields = ('id', 'product', 'product_img')
     
