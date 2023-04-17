@@ -49,5 +49,4 @@ class UserValidator(Schema):
           'required': 'La contraseña es requerida'
         }
     )
-    
-    
+
