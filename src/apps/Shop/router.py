@@ -187,6 +187,9 @@ def cart_list():
     return jsonify(cart_serializer.dump(cart))
 
 
+
+
+
 @bp.route("/cart", methods=["DELETE"])
 @jwt_required()
 def delete_item_cart():
