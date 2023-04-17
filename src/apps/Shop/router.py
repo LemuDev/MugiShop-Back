@@ -135,8 +135,7 @@ def add_to_cart():
             return jsonify(error="El producto que se intenta agregar no existe"), 404
 
         if product_by_id.is_sell == True:
-          
-        
+
             return jsonify(error="El producto que se intenta agregar ya fue vendido, las imagenes solo se venden una vez"), 400
 
         cart_by_user = Cart.query.filter_by(user_id=user_by_email.id).one_or_none()
@@ -162,10 +161,6 @@ def cart_list():
     user_by_email = Users.query.filter_by(email = current_user).one_or_none()
     
     cart_by_user = Cart.query.filter_by(user_id = user_by_email.id).one_or_none()
-    
-    
-
-    
     cart_items = CartItems.query.filter_by(cart_id=cart_by_user.id).all()
     
     cart = []
@@ -189,4 +184,52 @@ def cart_list():
     
     return jsonify(cart_serializer.dump(cart))
 
+
+
+
+@bp.route("/cart", methods=["DELETE"])
+@jwt_required()
+def delete_item_cart():
+    current_user = get_jwt_identity()
+    
+    if not request.is_json:
+        
+        return jsonify({
+            "error": "El formato de envio de datos no es correcto"
+        }), 400
+        
+    else:    
+        data = request.json
+        product_item_id = data.get("id")
+        
+        user = Users.query.filter_by(email=current_user).first()
+        
+        try:
+            product_item_id = int(product_item_id)
+        except :    
+            return jsonify(error="El tipo de dato del prodcto debe de ser numerico"), 400 
+        
+        
+        
+        cart = Cart.query.filter_by(user_id=user.id).first()
+
+        product_item = CartItems.query.filter_by(id=product_item_id).filter_by(cart_id=cart.id).one_or_none()
+
+        if product_item == None:
+            return jsonify(error="El producto que se intenta eliminar no esta agregado"), 404
+
+
+
+        db.session.delete(product_item)
+        db.session.commit()
+        
+        product_name = Products.query.filter_by(id=product_item.product_id).first()
+        product_name = product_name.name
+
+
+        return jsonify(message=f"Producto {product_name} eliminado correctamente")
+        
+
+        
+            
 
