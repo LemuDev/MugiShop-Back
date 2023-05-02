@@ -50,4 +50,9 @@ class UserValidator(Schema):
         }
     )
     
-    
+
+
+
+class User_Schema(Schema):
+    class Meta:
+        fields=("id", "first_name", "last_name", "email")

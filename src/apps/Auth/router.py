@@ -3,10 +3,11 @@ from flask import request
 
 import datetime
 from flask_jwt_extended import create_access_token
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from .models import Users
 from src.apps.Shop.models import Cart
 
-from .schemas import UserValidator
+from .schemas import UserValidator, User_Schema
 from src.config.db import db
 
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -119,6 +120,17 @@ def login():
 
 
 
+@bp.route("/profile", methods=["GET"])
+@jwt_required()
+def profile():
+    current_user = get_jwt_identity()
+
+    
+    user_by_email = Users.query.filter_by(email=current_user).first()
 
 
-
+    user_schema = User_Schema()
+    print(user_by_email)
+    
+    
+    return user_schema.dumps(user_by_email)
