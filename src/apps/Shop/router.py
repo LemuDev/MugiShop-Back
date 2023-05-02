@@ -12,14 +12,16 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
 bp = Blueprint("products", __name__, url_prefix="/api")
-
+# Produsts Schemas for one or multiple products
 product_schema = ProductsSchemas()
 products_schema = ProductsSchemas(many=True)
 
+# category Schemas for one or multiple Categories
 category_schema = CategoriesSchemas()
 categories_schema = CategoriesSchemas(many=True)
 
 
+# End Point for see all products
 @bp.route("/products", methods=["GET"])
 def products_list():
     name = request.args.get("name")
@@ -67,6 +69,8 @@ def products_list():
     
     return jsonify( products_schema.dump(products) )
 
+
+# Seed for add categories and products in databases
 @bp.route("/seed-shop", methods=["GET"])
 def seed_products():
     for c in categories_seed:
@@ -94,6 +98,8 @@ def seed_products():
     
     return jsonify({"message": "Seed Success"})
 
+
+# Endpoint for see all categories
 @bp.route("/categories", methods=["GET"])
 def categories_list():
     categories = Categories.query.all()
@@ -102,7 +108,8 @@ def categories_list():
 
 
 
-
+# End point for add cart
+# jwt is required
 @bp.route("/cart", methods=["POST"])
 @jwt_required()
 def add_to_cart():
@@ -155,6 +162,9 @@ def add_to_cart():
     
         return jsonify(message=f"{product_by_id.name} fue Agregado al carrito") 
 
+
+# EndPoint for see the cart
+# jwt is required
 @bp.route("/cart", methods=["GET"])
 @jwt_required()
 def cart_list():
@@ -186,10 +196,8 @@ def cart_list():
     
     return jsonify(cart_serializer.dump(cart))
 
-
-
-
-
+# EndPoint for delete the cart items
+# jwt is required
 @bp.route("/cart", methods=["DELETE"])
 @jwt_required()
 def delete_item_cart():

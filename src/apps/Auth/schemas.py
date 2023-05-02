@@ -1,6 +1,8 @@
 from marshmallow import Schema, fields
 from marshmallow.validate import Length
 
+
+# Schemas for validation data 
 class UserValidator(Schema):    
     first_name = fields.Str(required=True, 
         validate=[
@@ -52,7 +54,7 @@ class UserValidator(Schema):
     
 
 
-
+# Schemas serialization
 class User_Schema(Schema):
     class Meta:
         fields=("id", "first_name", "last_name", "email")

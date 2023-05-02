@@ -1,6 +1,6 @@
 from src.config.db import db
 
-
+# User Model
 class Users(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     
