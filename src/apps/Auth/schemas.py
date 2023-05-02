@@ -51,10 +51,11 @@ class UserValidator(Schema):
           'required': 'La contraseña es requerida'
         }
     )
-    
+
 
 
 # Schemas serialization
 class User_Schema(Schema):
     class Meta:
         fields=("id", "first_name", "last_name", "email")
+
