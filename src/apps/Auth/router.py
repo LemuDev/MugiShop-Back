@@ -132,13 +132,77 @@ def login():
 @jwt_required()
 def profile():
     current_user = get_jwt_identity()
-
-    
     user_by_email = Users.query.filter_by(email=current_user).first()
 
-
     user_schema = User_Schema()
-    print(user_by_email)
-    
     
     return user_schema.dumps(user_by_email)
+
+
+@bp.route("/profile", methods=["PUT"])
+@jwt_required()
+def edit_profile():
+    current_user = get_jwt_identity()
+        
+    if not request.is_json:
+        return jsonify(error="El formato no es adecuado")
+    else:   
+        errors = {
+            "first_name":[],
+            "last_name":[]
+        }
+        
+        first_name = request.json.get("first_name", None)
+        last_name = request.json.get("last_name", None)
+        
+        
+        if first_name == None:
+            errors["first_name"].append("EL nombre es requerido")
+        else:
+            first_name = str(first_name)
+            if len(first_name.strip()) < 0 or first_name == None:
+                errors["first_name"].append("EL nombre es requerido")
+
+            elif len(first_name.strip()) > 60:
+                errors["first_name"].append("El nombre debe de ser menor a 60 caracteres")
+        
+        if last_name == None:
+            errors["last_name"].append("EL Apellido es requerido")
+            
+        else:
+            last_name = str(last_name)
+            
+            
+            if len(last_name.strip()) < 0 or last_name == None:
+                errors["last_name"].append("EL Apellido es requerido")
+
+            elif len(last_name.strip()) > 60:
+                errors["last_name"].append("El Apellido debe de ser menor a 60 caracteres")
+        
+        
+        print(errors)
+        
+        if len( errors["first_name"] ) >= 1 or len(errors["last_name"]) >= 1:
+            if len(errors["first_name"]) >= 1 and len(errors["last_name"]) <= 0:
+                del errors["last_name"]
+                return jsonify(errors=errors)
+        
+
+            elif len(errors["last_name"]) >= 1 and len(errors["first_name"]) <= 0:
+                del errors["first_name"]
+                return jsonify(errors=errors)
+
+            else:
+                return jsonify(errors=errors)
+        
+        else:    
+            user_by_email = Users.query.filter_by(email=current_user).one_or_none()
+
+
+            user = Users.query.get(user_by_email.id)
+            user.first_name = first_name
+            user.last_name = last_name
+
+            db.session.commit()
+            
+            return jsonify(message="El perfil fue editado correctamente")
