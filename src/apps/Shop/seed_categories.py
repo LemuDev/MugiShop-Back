@@ -1,3 +1,5 @@
+# All categories
+
 categories = [
     "Abstract", 
     "Animals",

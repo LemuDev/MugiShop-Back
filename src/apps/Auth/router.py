@@ -13,9 +13,12 @@ from src.config.db import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
+# Bluepint main app
 bp = Blueprint('auth', __name__, url_prefix="/api")
 
 
+# Endpoint for register
+# Here You can register new User
 @bp.route("/register", methods=["POST"])
 def register():
 
@@ -90,6 +93,9 @@ def register():
     return jsonify(access_token=access_token)
 
 
+
+# Endpoint for Login
+# here you can Log In with your user
 @bp.route("/login", methods=["POST"])
 def login():
     data = request.json
@@ -119,11 +125,21 @@ def login():
     return jsonify(error="Email o contraseña incorrectos"), 400
 
 
+#  Endpoint for profile
+# here you can request the profile data
+# For need a JWT
+@bp.route("/profile", methods=["GET"])
+@jwt_required()
+def profile():
+    current_user = get_jwt_identity()
+    
+    user_by_email = Users.query.filter_by(email=current_user).first()
 
 @bp.route("/profile", methods=["GET"])
 @jwt_required()
 def profile():
     current_user = get_jwt_identity()
+
 
     
     user_by_email = Users.query.filter_by(email=current_user).first()
