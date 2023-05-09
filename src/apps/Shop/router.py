@@ -197,7 +197,6 @@ def cart_list():
 
 # EndPoint for delete the cart items
 # jwt is required
-
 @bp.route("/cart", methods=["DELETE"])
 @jwt_required()
 def delete_item_cart():

@@ -132,6 +132,7 @@ def login():
 @jwt_required()
 def profile():
     current_user = get_jwt_identity()
+
     user_by_email = Users.query.filter_by(email=current_user).first()
 
     user_schema = User_Schema()
@@ -199,10 +200,31 @@ def edit_profile():
             user_by_email = Users.query.filter_by(email=current_user).one_or_none()
 
 
+    
+    user_by_email = Users.query.filter_by(email=current_user).first()
+
+@bp.route("/profile", methods=["GET"])
+@jwt_required()
+def profile():
+    current_user = get_jwt_identity()
+
+
+    
+    user_by_email = Users.query.filter_by(email=current_user).first()
+
+
             user = Users.query.get(user_by_email.id)
             user.first_name = first_name
             user.last_name = last_name
 
+
             db.session.commit()
             
             return jsonify(message="El perfil fue editado correctamente")
+
+    user_schema = User_Schema()
+    print(user_by_email)
+    
+    
+    return user_schema.dumps(user_by_email)
+
