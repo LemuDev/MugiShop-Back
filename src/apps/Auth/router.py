@@ -132,6 +132,14 @@ def login():
 @jwt_required()
 def profile():
     current_user = get_jwt_identity()
+    
+    user_by_email = Users.query.filter_by(email=current_user).first()
+
+@bp.route("/profile", methods=["GET"])
+@jwt_required()
+def profile():
+    current_user = get_jwt_identity()
+
 
     
     user_by_email = Users.query.filter_by(email=current_user).first()
