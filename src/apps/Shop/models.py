@@ -35,7 +35,7 @@ class CartItems(db.Model):
     id = db.Column(db.Integer(), primary_key=True)    
     product_id = db.Column(db.Integer(), db.ForeignKey('products.id'))
     cart_id = db.Column(db.Integer(), db.ForeignKey('cart.id'))
-    
+    is_sell = db.Column(db.Boolean(), default=False)
         
 
 
