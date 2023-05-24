@@ -5,7 +5,7 @@ from .seed_categories import categories as categories_seed
 from .models import Products, Categories, CartItems, Cart
 from src.apps.Auth.models import Users
 from src.config.db import db
-from .schemas import ProductsSchemas, CategoriesSchemas, CartItemSchemas
+from .schemas import ProductsSchemas, CategoriesSchemas, CartItemSchemas, ProductSellSchemas
 import secrets
 import ast
  
@@ -91,6 +91,7 @@ def seed_products():
         products.name = p["name"]
         products.price = p["price"]
         products.description = ''
+        products.imagehd = p["imagehd"]
         products.image = p["image"]
         products.is_sell = p["is_sell"]        
         products.categories = p["category"]
@@ -245,6 +246,7 @@ def delete_item_cart():
         return jsonify(message=f"Producto {product_name} eliminado correctamente")
         
 
+# Generate order (link pay)
 @bp.route("/create-order", methods=["POST"])
 @jwt_required()
 def GoPay():
@@ -353,6 +355,8 @@ def confirmPay():
             return jsonify(error="No se pudo confirmar el pago" )    
 
 
+
+# get the order payed (Link for pay)
 def getOrder(id_order):
     token = get_paypal_token()
     token = token["access_token"]
@@ -371,6 +375,7 @@ def getOrder(id_order):
     
     return response
 
+# Get the paypal token  
 def get_paypal_token():
     auth = ('AYJxnaEndV8YqpfEONJaUE3R07Qoetbn9O9Xpl_cX6Ii53sUuI4FH4pd-MruXY1pUO_Ai46oct9eDuO_', 'EIgOCaF8UM1LKuJy6XERI8ByZg3gTWAkhF_JaDfi_AiHclXTsRijTVGCvsy4Sse_mbzGXyRKBE1TcktF')
     
@@ -389,3 +394,36 @@ def get_paypal_token():
     response = response.json()
         
     return response
+
+
+
+# Get my nfts by user using JWT
+@bp.route("/my-nfts", methods=["GET"])
+@jwt_required()
+def getMyNfts():
+    current_user = get_jwt_identity()
+    productSellSchemas = ProductSellSchemas(many=True)
+    
+    user_by_email = Users.query.filter_by(email=current_user).one_or_none()
+    
+    if user_by_email == None:
+        return jsonify(msg="El usuario no es valido")
+
+    cart_by_user = Cart.query.filter_by(user_id=user_by_email.id).one_or_none()
+    items_cart = CartItems.query.filter_by(is_sell=True).filter_by(cart_id=cart_by_user.id)
+    items_cart = items_cart.all()    
+    
+    nfts=[]
+        
+    for item in items_cart:
+        product_by_id = Products.query.filter_by(id=item.product_id).one_or_none()
+                
+        nfts.append(product_by_id)
+    
+    
+    for nft in nfts:
+        nft.categories = nft.categories_rel.name
+        
+    
+    nfts = productSellSchemas.dump(nfts)
+    return jsonify(nfts=nfts)
