@@ -16,7 +16,7 @@ class Products(db.Model):
     description = db.Column(db.String(255))
     price = db.Column(db.Integer())
     image = db.Column(db.String(255))
-    
+    imagehd = db.Column(db.String(255))
     is_sell = db.Column(db.Boolean(), default=False)
     created_at = db.Column(db.Date(), default=date.today() )
     
