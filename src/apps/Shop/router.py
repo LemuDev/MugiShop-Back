@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, redirect
 from .seed_products import products as products_seed
 from .seed_categories import categories as categories_seed
 
@@ -6,9 +6,13 @@ from .models import Products, Categories, CartItems, Cart
 from src.apps.Auth.models import Users
 from src.config.db import db
 from .schemas import ProductsSchemas, CategoriesSchemas, CartItemSchemas
-
+import secrets
+import ast
+ 
 
 from flask_jwt_extended import jwt_required, get_jwt_identity
+
+import requests
 
 
 bp = Blueprint("products", __name__, url_prefix="/api")
@@ -240,6 +244,149 @@ def delete_item_cart():
         return jsonify(message=f"Producto {product_name} eliminado correctamente")
         
 
+@bp.route("/create-order", methods=["POST"])
+@jwt_required()
+def GoPay():
+    current_user = get_jwt_identity()
+    token = get_paypal_token()
+    token = token["access_token"]
+
+    user_by_email = Users.query.filter_by(email=current_user).one_or_none()
+    cart_by_user = Cart.query.filter_by(user_id=user_by_email.id).one_or_none()
+    cart_items = CartItems.query.filter_by(cart_id=cart_by_user.id).filter_by(is_sell=False) 
+
+    if cart_items.count() <= 0:
+        print(cart_items)
+        print(cart_items)
         
+        return jsonify(error="No tienes productos agregados en el carrito")
+
+
+    total = 0
+    id_for_produts = []
+    
+    for item in cart_items:
+        id_product = item.product_id
+        
+        id_for_produts.append(id_product)
+        
+        product = Products.query.get(id_product)
+        
+        
+        total += product.price
+
+
+    headers = {
+        'Accept' : 'application/json',
+        'Content-Type' : 'application/json',
+
+        'PayPal-Request-Id': secrets.token_hex(32),
+        'Authorization': 'Bearer ' + token,
+    }
+    
+    reference = {
+        "user": user_by_email.id,
+        "products": id_for_produts
+    }
+    
+    reference = str(reference)
+   
+    # "cancel_url": "https://example.com/cancelUrl" 
+    data = '{ "intent": "CAPTURE", "purchase_units": [ {"reference_id" : "'+ reference + '", "amount": { "currency_code": "USD", "value": "' + str(total) + '" } } ], "payment_source": { "paypal": { "experience_context": { "payment_method_preference": "IMMEDIATE_PAYMENT_REQUIRED", "payment_method_selected": "PAYPAL", "brand_name": "EXAMPLE INC", "locale": "en-US", "landing_page": "LOGIN", "user_action": "PAY_NOW", "return_url": "http://127.0.0.1:8000/api/confirm-pay"} } } }'
+    
+    response = requests.post('https://api-m.sandbox.paypal.com/v2/checkout/orders', headers=headers, data=data)
+    
+    response=response.json()
+
+    link_pay = response["links"][1]["href"]
+
+    return jsonify(link_pay=link_pay)
+
+@bp.route("/confirm-pay", methods=["GET"])
+def confirmPay():
+    token_args = request.args.get("token", None)
+    PayerID = request.args.get("PayerID", None)
+
+    if token_args == None or PayerID == None:
+        return jsonify(error="Debes de pagar para acceder")
+    
+    
+    response = getOrder(token_args)
+    
+    if not "status" in response:
+        return jsonify(error="No se puede confirmar pago debes de pagar para confirmar---")
+    else:
+        if response["status"] == "COMPLETED":
+ 
+            reference = response["purchase_units"][0]["reference_id"]
+            reference = ast.literal_eval(reference)
             
+            
+            user_id = reference["user"]
+            user_id = int(user_id)
+            products_ids = reference["products"]
+            
+            print("User_id:", user_id)
+            print("products ids:", products_ids)
+            
+            for id in products_ids:
+                print("Product-id:", id)
+                product = Products.query.get(id)
+                product.is_sell = True
+                
+                
+                
+                cart = Cart.query.filter_by(user_id=user_id).one_or_none()
+                cart_items = CartItems.query.filter_by(product_id=id).filter_by(cart_id=cart.id).filter_by(is_sell=False).all()
+
+                for item in cart_items:
+                    item.is_sell = True
+            
+            db.session.commit()
+                
+                
+                
+
+            return redirect("http://127.0.0.1:3000/thanks")
+        else:
+            return jsonify(error="No se pudo confirmar el pago" )    
+
+
+def getOrder(id_order):
+    token = get_paypal_token()
+    token = token["access_token"]
+    
+    
+    headers = {
+        'Accept' : 'application/json',
+        'Content-Type' : 'application/json',
+        'PayPal-Request-Id': '7b92603e-77ed-4896-8e78-5dea2050476a',
+        'Authorization':  'Bearer ' + token
+    }
+    
+    response = requests.post(f'https://api-m.sandbox.paypal.com/v2/checkout/orders/{id_order}/capture', headers=headers)
+    response = response.json()
+    
+    
+    return response
+
+def get_paypal_token():
+    auth = ('AYJxnaEndV8YqpfEONJaUE3R07Qoetbn9O9Xpl_cX6Ii53sUuI4FH4pd-MruXY1pUO_Ai46oct9eDuO_', 'EIgOCaF8UM1LKuJy6XERI8ByZg3gTWAkhF_JaDfi_AiHclXTsRijTVGCvsy4Sse_mbzGXyRKBE1TcktF')
+    
+    
+
+    data = {
+        'grant_type': 'client_credentials',
+    }
+
+    response = requests.post(
+        'https://api-m.sandbox.paypal.com/v1/oauth2/token', 
+        data=data, 
+        auth=auth
+    )
+    
+    response = response.json()
+        
+      
+    return response
 
