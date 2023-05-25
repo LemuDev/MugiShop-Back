@@ -50,17 +50,11 @@ class UserValidator(Schema):
         error_messages={
           'required': 'La contraseña es requerida'
         }
-   
-     
-# Schemas serialization
-
-class User_Schema(Schema):
-    class Meta:
-        fields=("id", "first_name", "last_name", "email")
+    )
+    
 
 
 # Schemas serialization
 class User_Schema(Schema):
     class Meta:
         fields=("id", "first_name", "last_name", "email")
-
