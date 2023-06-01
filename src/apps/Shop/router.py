@@ -335,8 +335,8 @@ def confirmPay():
             for id in products_ids:
                 print("Product-id:", id)
                 product = Products.query.get(id)
-                # product.is_sell = True
-                # db.session.commit()
+                product.is_sell = True
+                db.session.commit()
                 
                 
                 cart = Cart.query.filter_by(user_id=user_id).one_or_none()
