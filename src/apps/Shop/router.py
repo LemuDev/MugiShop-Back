@@ -49,8 +49,8 @@ def products_list():
         return jsonify( products_schema.dump(products_by_name) )
     else:
         if category is not None:
-            products_by_name = Products.query.filter_by(categories=category).all()
-            products_by_name_count = Products.query.filter_by(categories=category).count()
+            products_by_name = Products.query.filter_by(categories=category).filter_by(is_sell=False).all()
+            products_by_name_count = Products.query.filter_by(categories=category).filter_by(is_sell=False).count()
         
         
             if products_by_name_count  >= 1:
@@ -178,7 +178,7 @@ def cart_list():
     
     cart_by_user = Cart.query.filter_by(user_id = user_by_email.id).one_or_none()
     
-    cart_items = CartItems.query.filter_by(cart_id=cart_by_user.id).all()
+    cart_items = CartItems.query.filter_by(cart_id=cart_by_user.id).filter_by(is_sell=False).all()
     
     cart = []
     for c_i in cart_items:
