@@ -5,7 +5,9 @@ from .seed_categories import categories as categories_seed
 from .models import Products, Categories, CartItems, Cart
 from src.apps.Auth.models import Users
 from src.config.db import db
+
 from .schemas import ProductsSchemas, CategoriesSchemas, CartItemSchemas, ProductSellSchemas
+
 import secrets
 import ast
  
@@ -147,9 +149,8 @@ def add_to_cart():
             return jsonify(error="El producto que se intenta agregar no existe"), 404
 
         if product_by_id.is_sell == True:
-           
-            return jsonify(error="El producto que se intenta agregar ya fue vendido, las imagenes solo se venden una vez"), 400
 
+            return jsonify(error="El producto que se intenta agregar ya fue vendido, las imagenes solo se venden una vez"), 400
 
         cart_by_user = Cart.query.filter_by(user_id=user_by_email.id).one_or_none()
         is_item_in_cart = CartItems.query.filter_by(cart_id=cart_by_user.id).filter_by(product_id=product_by_id.id).count()
@@ -179,6 +180,7 @@ def cart_list():
     cart_by_user = Cart.query.filter_by(user_id = user_by_email.id).one_or_none()
     
     cart_items = CartItems.query.filter_by(cart_id=cart_by_user.id).filter_by(is_sell=False).all()
+
     
     cart = []
     for c_i in cart_items:
@@ -198,6 +200,7 @@ def cart_list():
     
     
     return jsonify(cart_serializer.dump(cart))
+
 
 # EndPoint for delete the cart items
 # jwt is required
@@ -245,6 +248,7 @@ def delete_item_cart():
         
 
 # Generate order (link pay)
+
 @bp.route("/create-order", methods=["POST"])
 @jwt_required()
 def GoPay():
@@ -270,10 +274,10 @@ def GoPay():
         id_product = item.product_id
         
         id_for_produts.append(id_product)
-        
+
         product = Products.query.get(id_product)
         
-        
+
         total += product.price
 
 
@@ -321,8 +325,7 @@ def confirmPay():
  
             reference = response["purchase_units"][0]["reference_id"]
             reference = ast.literal_eval(reference)
-            
-            
+
             user_id = reference["user"]
             user_id = int(user_id)
             products_ids = reference["products"]
@@ -348,6 +351,7 @@ def confirmPay():
 
                     
                     db.session.commit()
+
                 
                 
                 
@@ -377,6 +381,7 @@ def getOrder(id_order):
     
     return response
 
+
 # Get the paypal token  
 def get_paypal_token():
     auth = ('AYJxnaEndV8YqpfEONJaUE3R07Qoetbn9O9Xpl_cX6Ii53sUuI4FH4pd-MruXY1pUO_Ai46oct9eDuO_', 'EIgOCaF8UM1LKuJy6XERI8ByZg3gTWAkhF_JaDfi_AiHclXTsRijTVGCvsy4Sse_mbzGXyRKBE1TcktF')
@@ -386,6 +391,19 @@ def get_paypal_token():
     data = {
         'grant_type': 'client_credentials',
     }
+
+
+    response = requests.post(
+        'https://api-m.sandbox.paypal.com/v1/oauth2/token', 
+        data=data, 
+        auth=auth
+    )
+    
+    response = response.json()
+        
+      
+    return response
+
 
     response = requests.post(
         'https://api-m.sandbox.paypal.com/v1/oauth2/token', 
