@@ -188,13 +188,11 @@ def cart_list():
         cart.append({
             "id":c_i.id,
             "product": product.name,
+            "price": product.price,
             "product_img": product.image
         })
         
-        
-        print("product_img", c_i.cart.user_id)
-    
-    
+       
     
     cart_serializer = CartItemSchemas(many=True)
     
