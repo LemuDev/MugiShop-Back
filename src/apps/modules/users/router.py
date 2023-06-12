@@ -4,8 +4,8 @@ from flask import request
 import datetime
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from .models import Users
-from src.apps.Shop.models import Cart
+from .model import Users
+from src.apps.modules.cart.model import Cart
 
 from .schemas import UserValidator, User_Schema
 from src.config.db import db
@@ -14,20 +14,18 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 
 # Bluepint main app
-bp = Blueprint('auth', __name__, url_prefix="/api")
+bp = Blueprint('user', __name__, url_prefix="/api")
 
 
 # Endpoint for register
 # Here You can register new User
 @bp.route("/register", methods=["POST"])
 def register():
-
     if not request.is_json:
         
         return jsonify({
             "Error": "Los datos Deben de ser un Json. Datos No procesables"
         }, 400)
-    
     
     data = request.json
     
@@ -40,7 +38,6 @@ def register():
         return jsonify({
             "Error": "No se pasan los datos necesarios para crear un usuario"
         }), 400
-    
     
     new_user_data = {
         "first_name": first_name,
@@ -69,21 +66,21 @@ def register():
 
     password_hash = generate_password_hash(password)
 
-    create_user = Users()
-    create_user.first_name = first_name
-    create_user.last_name = last_name
-    create_user.email = email
-    create_user.password = password_hash
-    create_user.is_admin = False
+    new_user = Users(
+        first_name=first_name,
+        last_name=last_name,
+        email=email ,
+        password=password_hash,
+        is_admin = False
+    )
     
-    db.session.add(create_user)
+    db.session.add(new_user)
     db.session.commit()
   
     # Crear Carrito 
     user_id = Users.query.filter_by(email = email).first()
   
-    create_cart = Cart()
-    create_cart.user_id = user_id.id  
+    create_cart = Cart(user_id = user_id.id )
     db.session.add(create_cart)
     db.session.commit()
          
@@ -98,8 +95,14 @@ def register():
 # here you can Log In with your user
 @bp.route("/login", methods=["POST"])
 def login():
+    if not request.is_json:
+        
+        return jsonify({
+            "Error": "Los datos Deben de ser un Json. Datos No procesables"
+        }, 400)
+    
+    
     data = request.json
-
 
     email = data.get("email")
     password = data.get("password")
@@ -125,6 +128,9 @@ def login():
     return jsonify(error="Email o contraseña incorrectos"), 400
 
 
+
+
+
 #  Endpoint for profile
 # here you can request the profile data
 # For need a JWT
@@ -145,7 +151,8 @@ def edit_profile():
     current_user = get_jwt_identity()
         
     if not request.is_json:
-        return jsonify(error="El formato no es adecuado")
+        return jsonify(error="El formato no es adecuado"), 400
+    
     else:   
         errors = {
             "first_name":[],

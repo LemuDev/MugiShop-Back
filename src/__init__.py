@@ -6,9 +6,21 @@ from src.config.ma import ma
 from src.config.jwt import jwt
 
 from decouple import config
-from src.apps.Shop.router import bp as shop_router
-from src.apps.Auth.router import bp as auth_router
-from os import getcwd
+
+# Blueprints modules importatation
+from src.apps.modules.cart.router import bp as cart_bp
+from src.apps.modules.categories.router import bp as categories_bp
+from src.apps.modules.product_sell.router import bp as product_sell_bp
+from src.apps.modules.products.router import bp as products_bp
+from src.apps.modules.users.router import bp as user_bp
+
+
+# Models importation
+from src.apps.modules.cart.model import *
+from src.apps.modules.categories.model import *
+from src.apps.modules.products.model import *
+from src.apps.modules.users.model import *
+
 
 
 # Create instance flask
@@ -26,8 +38,11 @@ cors = CORS(
 )
 
 # Register Modules Blueprints
-app.register_blueprint(shop_router)
-app.register_blueprint(auth_router)
+app.register_blueprint(categories_bp)
+app.register_blueprint(cart_bp)
+app.register_blueprint(user_bp)
+app.register_blueprint(products_bp)
+app.register_blueprint(product_sell_bp)
 
 
 # init All apps config
@@ -39,4 +54,7 @@ jwt.init_app(app)
 
 
 
-
+def db_init():
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
