@@ -1,4 +1,5 @@
 import requests
+from decouple import config
 
 # get the order payed (Link for pay)
 def getOrder(id_order):
@@ -21,7 +22,7 @@ def getOrder(id_order):
 
 # Get the paypal token  
 def get_paypal_token():
-    auth = ('AYJxnaEndV8YqpfEONJaUE3R07Qoetbn9O9Xpl_cX6Ii53sUuI4FH4pd-MruXY1pUO_Ai46oct9eDuO_', 'EIgOCaF8UM1LKuJy6XERI8ByZg3gTWAkhF_JaDfi_AiHclXTsRijTVGCvsy4Sse_mbzGXyRKBE1TcktF')
+    auth = (config("CLIENT_ID"), config("CLIENT_SECRET") )
     
     
 
