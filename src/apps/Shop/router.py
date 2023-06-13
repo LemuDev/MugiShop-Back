@@ -337,21 +337,26 @@ def confirmPay():
                 print("Product-id:", id)
                 product = Products.query.get(id)
                 product.is_sell = True
-                
+                db.session.commit()
                 
                 
                 cart = Cart.query.filter_by(user_id=user_id).one_or_none()
                 cart_items = CartItems.query.filter_by(product_id=id).filter_by(cart_id=cart.id).filter_by(is_sell=False).all()
 
                 for item in cart_items:
+                    
+                    print(item)
+                    
                     item.is_sell = True
 
-            db.session.commit()
+                    
+                    db.session.commit()
+
                 
                 
                 
 
-            return redirect("http://127.0.0.1:3000/thanks")
+            return redirect("http://127.0.0.1:5173/profile")
         else:
             return jsonify(error="No se pudo confirmar el pago" )    
 
