@@ -4,6 +4,8 @@ from flask import jsonify, request, redirect
 from src.config.db import db
 from .utils import get_paypal_token, getOrder
 
+from decouple import config
+
 # Jwt 
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
@@ -20,8 +22,6 @@ from .schemas import ProductSellSchemas
 import requests
 import secrets
 import ast
-
-
 
 
 # Blueprint definition
@@ -74,10 +74,10 @@ def GoPay():
     
     reference = str(reference)
    
-    # "cancel_url": "https://example.com/cancelUrl" 
-    data = '{ "intent": "CAPTURE", "purchase_units": [ {"reference_id" : "'+ reference + '", "amount": { "currency_code": "USD", "value": "' + str(total) + '" } } ], "payment_source": { "paypal": { "experience_context": { "payment_method_preference": "IMMEDIATE_PAYMENT_REQUIRED", "payment_method_selected": "PAYPAL", "brand_name": "EXAMPLE INC", "locale": "en-US", "landing_page": "LOGIN", "user_action": "PAY_NOW", "return_url": "http://127.0.0.1:8000/api/confirm-pay"} } } }'
+
+    data = '{ "intent": "CAPTURE", "purchase_units": [ {"reference_id" : "'+ reference + '", "amount": { "currency_code": "USD", "value": "' + str(total) + '" } } ], "payment_source": { "paypal": { "experience_context": { "payment_method_preference": "IMMEDIATE_PAYMENT_REQUIRED", "payment_method_selected": "PAYPAL", "brand_name": "EXAMPLE INC", "locale": "en-US", "landing_page": "LOGIN", "user_action": "PAY_NOW", "return_url":'+ config("URL_CONFIRM_PAY") + '} } } }'
     
-    response = requests.post('https://api-m.sandbox.paypal.com/v2/checkout/orders', headers=headers, data=data)
+    response = requests.post(config("URL_GET_ORDER"), headers=headers, data=data)
     
     response=response.json()
 
@@ -123,7 +123,7 @@ def confirmPay():
                                 
                     db.session.commit()
                 
-            return redirect("http://127.0.0.1:5173/profile")
+            return redirect(config["URL_FRONTEND_PROFILE"])
         else:
             return jsonify(error="No se pudo confirmar el pago" )    
 
