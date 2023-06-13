@@ -178,7 +178,7 @@ def cart_list():
     user_by_email = Users.query.filter_by(email = current_user).one_or_none()
     
     cart_by_user = Cart.query.filter_by(user_id = user_by_email.id).one_or_none()
- 
+
     cart_items = CartItems.query.filter_by(cart_id=cart_by_user.id).filter_by(is_sell=False).all()
 
     
@@ -190,13 +190,11 @@ def cart_list():
         cart.append({
             "id":c_i.id,
             "product": product.name,
+            "price": product.price,
             "product_img": product.image
         })
         
-        
-        print("product_img", c_i.cart.user_id)
-    
-    
+       
     
     cart_serializer = CartItemSchemas(many=True)
     

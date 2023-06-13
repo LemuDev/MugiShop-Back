@@ -30,5 +30,6 @@ class CategoriesSchemas(ma.Schema):
 class CartItemSchemas(ma.Schema):
 
     class Meta:
-        fields = ('id', 'product', 'product_img')
-    
+
+        fields = ('id', 'product', 'price', 'product_img')
+   
