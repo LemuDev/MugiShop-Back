@@ -36,12 +36,12 @@ def products_list():
 
 
     if name is not None:
-        products_by_name = Products.query.filter(Products.name.ilike("%" + name + "%")).all()
-        products_by_name_count = Products.query.filter(Products.name.ilike("%" + name + "%")).count()
+        products_by_name = Products.query.filter(Products.name.ilike("%" + name + "%")).filter_by(is_sell=False).all()
+        products_by_name_count = Products.query.filter(Products.name.ilike("%" + name + "%")).filter_by(is_sell=False).count()
         
         if category is not None:
-            products_by_name = Products.query.filter(Products.name.ilike("%" + name + "%")).filter_by(categories=category).all()
-            products_by_name_count = Products.query.filter(Products.name.ilike("%" + name + "%")).filter_by(categories=category).count()
+            products_by_name = Products.query.filter(Products.name.ilike("%" + name + "%")).filter_by(categories=category).filter_by(is_sell=False).all()
+            products_by_name_count = Products.query.filter(Products.name.ilike("%" + name + "%")).filter_by(categories=category).filter_by(is_sell=False).count()
         
         if products_by_name_count  >= 1:
       
@@ -51,8 +51,8 @@ def products_list():
         return jsonify( products_schema.dump(products_by_name) )
     else:
         if category is not None:
-            products_by_name = Products.query.filter_by(categories=category).all()
-            products_by_name_count = Products.query.filter_by(categories=category).count()
+            products_by_name = Products.query.filter_by(categories=category).filter_by(is_sell=False).all()
+            products_by_name_count = Products.query.filter_by(categories=category).filter_by(is_sell=False).count()
         
         
             if products_by_name_count  >= 1:
@@ -67,7 +67,7 @@ def products_list():
 
     # when there are not args
     
-    products = Products.query.filter().all()
+    products = Products.query.filter_by(is_sell=False).all()
     
     for p in products:
         
@@ -178,7 +178,9 @@ def cart_list():
     user_by_email = Users.query.filter_by(email = current_user).one_or_none()
     
     cart_by_user = Cart.query.filter_by(user_id = user_by_email.id).one_or_none()
-    cart_items = CartItems.query.filter_by(cart_id=cart_by_user.id).all()
+ 
+    cart_items = CartItems.query.filter_by(cart_id=cart_by_user.id).filter_by(is_sell=False).all()
+
     
     cart = []
     for c_i in cart_items:
