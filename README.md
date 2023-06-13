@@ -9,13 +9,24 @@ pip install -m virtualenv
 ## Crear y activar Entorno virtual
 ```
 virtualenv env
+```
+
+```
 cd env/scripts
+```
+
+```
 activate
+```
+
+```
 cd ../..
 ```
 
-
+```
 ## Instalar dependencias 
+```
+
 ```
 pip install -r requirements.txt
 ```
@@ -24,7 +35,13 @@ pip install -r requirements.txt
 ## Crear Tablas de los modelos
 ```
 python
+```
+
+```
 from src import db_init
+```
+
+```
 db_init()
 ```
 
