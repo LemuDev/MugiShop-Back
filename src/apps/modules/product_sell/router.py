@@ -75,7 +75,7 @@ def GoPay():
     reference = str(reference)
    
 
-    data = '{ "intent": "CAPTURE", "purchase_units": [ {"reference_id" : "'+ reference + '", "amount": { "currency_code": "USD", "value": "' + str(total) + '" } } ], "payment_source": { "paypal": { "experience_context": { "payment_method_preference": "IMMEDIATE_PAYMENT_REQUIRED", "payment_method_selected": "PAYPAL", "brand_name": "EXAMPLE INC", "locale": "en-US", "landing_page": "LOGIN", "user_action": "PAY_NOW", "return_url":'+ config("URL_CONFIRM_PAY") + '} } } }'
+    data = '{ "intent": "CAPTURE", "purchase_units": [ {"reference_id" : "'+ reference + '", "amount": { "currency_code": "USD", "value": "' + str(total) + '" } } ], "payment_source": { "paypal": { "experience_context": { "payment_method_preference": "IMMEDIATE_PAYMENT_REQUIRED", "payment_method_selected": "PAYPAL", "brand_name": "EXAMPLE INC", "locale": "en-US", "landing_page": "LOGIN", "user_action": "PAY_NOW", "return_url":"' + config("URL_CONFIRM_PAY") + '"} } } }'
     
     response = requests.post(config("URL_GET_ORDER"), headers=headers, data=data)
     
@@ -122,8 +122,9 @@ def confirmPay():
                     item.is_sell = True
                                 
                     db.session.commit()
-                
-            return redirect(config["URL_FRONTEND_PROFILE"])
+
+
+            return redirect(f'{ config("URL_FRONTEND_PROFILE") }')
         else:
             return jsonify(error="No se pudo confirmar el pago" )    
 
