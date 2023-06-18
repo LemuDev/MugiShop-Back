@@ -58,3 +58,26 @@ class UserValidator(Schema):
 class User_Schema(Schema):
     class Meta:
         fields=("id", "first_name", "last_name", "email")
+
+class EditProfileValidator(Schema):
+    first_name = fields.Str(required=True, 
+        validate=[
+            Length(max=100, error="El Nombre debe de tener menos de 100 caracteres"),
+            Length(min=1, error="El Nombre no puede estar vacio")
+        ],
+        
+        error_messages={
+          'required': 'El Nombre es requerido'
+        }
+    )
+    
+    last_name = fields.Str(required=True, 
+        validate=[
+            Length(max=100, error="El Apellidos debe de tener menos de 100 caracteres"),
+            Length(min=1, error="El apellido no puede estar vacio")
+        ],
+        
+        error_messages={
+          'required': 'El Apellido es requerido'
+        }
+    )
