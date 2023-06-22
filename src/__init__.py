@@ -34,7 +34,7 @@ app.config["JWT_SECRET_KEY"] = config('JWT_SECRET_KEY')
 # Cors config for to allow access the front 
 cors = CORS(
     app, 
-    origins=['http://localhost:5173', 'http://127.0.0.1:5173']
+    origins=['http://localhost:5000', 'http://127.0.0.1:5000']
 )
 
 # Register Modules Blueprints
